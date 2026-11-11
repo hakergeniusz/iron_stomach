@@ -1,0 +1,45 @@
+[mod]
+id = "iron_stomach"
+version = "1.0.0"
+priority = 100
+
+# The commit it was tested on: it holds the server-side food tick whole for
+# one captured entity id, so a Horizon change in the hunger sources or the
+# native tick hook needs a re-check.
+[compatibility]
+horizon_revision = "2ebf00a0281c592f79191e76fce0e7d522c6f425"
+
+# The captured decision the food tick reads: which entity id is this
+# window's local player. `pub` so the tick hook's helper (a different crate
+# at this Horizon revision) can reach it.
+[[module]]
+id = "gate"
+file = "crates/horizon-client/src/hunger.rs"
+name = "iron_stomach_gate"
+source = "gate.rs"
+visibility = "pub"
+
+# Every tick, the window game publishes its local player's entity id —
+# `game.remote`'s — and clears it once the world is gone. Server games
+# (the single player server thread, dedicated servers) leave it alone.
+[[injection]]
+id = "capture"
+kind = "HEAD"
+target = "horizon_client::game::native_hooks::Game<'_>::native_tick"
+helper = "writer.rs"
+bindings = [
+  { name = "game", ty = "&mut crate::game::Game<'_>", value = "&mut *self" },
+]
+
+# The local player's food tick, held whole while the decision says so: no
+# drain, no hunger-cost healing, no starvation damage. Cancellable HEAD —
+# `Break(Ok(()))` skips the tick body with its own success result.
+[[injection]]
+id = "hold"
+kind = "HEAD"
+cancellable = true
+target = "horizon_client::hunger::PlayerMotion::food_tick"
+helper = "hold.rs"
+bindings = [
+  { name = "player", ty = "&mut PlayerMotion", value = "&mut *self" },
+]
