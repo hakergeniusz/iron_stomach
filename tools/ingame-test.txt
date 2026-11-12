@@ -28,6 +28,6 @@ state
 screenshot iron-stomach-1-regen
 # the eat-anything check: eat while full (food 20) — nothing should change
 # because the freeze pins the bar; vanilla would refuse at full.
-chat /effect give @s minecraft:hunger 0
+effect hunger 0
 sleep 1
 state
