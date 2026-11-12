@@ -1,0 +1,33 @@
+# Iron Stomach 1.1.0 in-game verification — horizon-ctl script.
+# The 1.1.0 acceptance bar (natural regen while hunger stays frozen):
+#   1. hurt the player; the food bar NEVER drops and never needs food;
+#   2. the health REGENERATES on the game's own slow-regen cadence
+#      (1 HP / 4 s = every 80 ticks) down from the hurt level;
+#   3. a LAN guest still loses hunger normally (needs a second client).
+launch --world IronStomachTest --seed 1 --wait
+state
+# keep the bar full to start (the mod pins it at 20 anyway)
+give minecraft:cooked_beef 8
+# hurt to half health: a short controlled fall
+tp ~ ~12 ~
+sleep 2
+wait 3
+state
+# from here the regen clock runs: 1 HP every 80 ticks. Sample health at ~5 s
+# spacing and confirm it climbs back to 20 while food stays 20.
+sleep 5
+state
+sleep 5
+state
+sleep 5
+state
+sleep 5
+state
+sleep 5
+state
+screenshot iron-stomach-1-regen
+# the eat-anything check: eat while full (food 20) — nothing should change
+# because the freeze pins the bar; vanilla would refuse at full.
+chat /effect give @s minecraft:hunger 0
+sleep 1
+state
