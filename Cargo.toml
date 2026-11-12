@@ -1,6 +1,6 @@
 [package]
 name = "horizon-iron_stomach"
-version = "1.0.0"
+version = "1.1.0"
 edition = "2024"
 license = "MIT"
 description = "Holds the local player's hunger: food never drains and starvation never hurts, while LAN guests and mobs keep vanilla hunger. A Horizon native mod."

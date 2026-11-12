@@ -1,6 +1,6 @@
 [mod]
 id = "iron_stomach"
-version = "1.0.0"
+version = "1.1.0"
 priority = 100
 
 # The commit it was tested on: it holds the server-side food tick whole for
@@ -33,7 +33,9 @@ bindings = [
 
 # The local player's food tick, held whole while the decision says so: no
 # drain, no hunger-cost healing, no starvation damage. Cancellable HEAD —
-# `Break(Ok(()))` skips the tick body with its own success result.
+# The freeze: exhaustion zeroed and the food level floored at full, then
+# the tick runs — the drain never fires and the vanilla regeneration
+# inside it keeps healing.
 [[injection]]
 id = "hold"
 kind = "HEAD"

@@ -1,7 +1,10 @@
 //! Iron Stomach's frozen decision, as pure standard library: which entity id
-//! is the local player, and whose food tick must therefore be held. The mod
-//! itself is thin splices over Horizon's own food tick; this library carries
-//! the rules and their tests.
+//! is the local player, and whose food tick runs drained of its drain. The
+//! mod itself is thin splices over Horizon's own food tick — 1.0 cancelled
+//! the tick whole, which also killed the natural regeneration inside it;
+//! 1.1 zeroes the exhaustion (and floors the food level) so the game's own
+//! regeneration blocks keep healing while the drain never fires. This
+//! library carries the rules and their tests.
 
 /// The captured state's sentinel: no window game has published a local
 /// player (no world open, or the decision cleared). An entity id of
@@ -21,9 +24,10 @@ pub fn decode(captured: i32) -> Option<u32> {
     (captured != NONE).then_some(captured as u32)
 }
 
-/// Whether the food tick of the entity `ticking` must be held whole: exactly
-/// when it is the captured local player. Guests and mobs keep vanilla hunger,
-/// and without a capture nobody is held.
+/// Whether the food tick of the entity `ticking` runs drained of its drain
+/// (exhaustion zeroed, food floored at full): exactly when it is the captured
+/// local player. Guests and mobs keep vanilla hunger, and without a capture
+/// nobody is held.
 pub fn freezes(captured: i32, ticking: u32) -> bool {
     decode(captured) == Some(ticking)
 }

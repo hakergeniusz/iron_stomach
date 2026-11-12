@@ -105,18 +105,49 @@ mod tests {
         assert_eq!(captured(), None);
     }
 
+    /// The frozen player's tick now RUNS: the hook zeroes the exhaustion
+    /// before the body reads it, so the drain block never fires and the
+    /// vanilla regeneration blocks inside the tick keep working. At full
+    /// health nothing heals, and the food level never moves.
     #[test]
-    fn held_local_keeps_food_exhaustion_timer_and_health() {
+    fn the_frozen_player_loses_nothing_and_the_tick_runs() {
         let _decision = Decision::on();
         let mut local = player(LOCAL, 20, 5.0, 79);
         local
             .food_tick(&resources().health, HealthRules::default())
             .unwrap();
         assert_eq!(local.health.food.food, 20, "the food level never drops");
-        assert_eq!(local.health.food.exhaustion, 5.0, "the tick is held whole");
-        assert_eq!(local.health.food.timer, 79);
+        assert_eq!(local.health.food.exhaustion, 0.0, "the drain never fires");
+        assert_eq!(local.health.food.timer, 0, "no branch held the timer");
         assert_eq!(local.health.health(), 20.0);
         assert!(local.events.is_empty(), "no starvation, no healing");
+    }
+
+    /// The point of 1.1.0: the frozen player still regenerates — the game's
+    /// own slow-regen block (food ≥ 18, one heart per four seconds, the
+    /// gamerule and difficulty as the server holds them) heals while the
+    /// food level stays frozen, and the heal's own exhaustion cost is dead
+    /// by the next tick.
+    #[test]
+    fn the_frozen_player_still_regenerates_naturally() {
+        let _decision = Decision::on();
+        let mut local = player(LOCAL, 20, 0.0, 0);
+        local.set_health(10.0, false).expect("hurt to 10");
+        for _ in 0..81 {
+            local
+                .food_tick(&resources().health, HealthRules::default())
+                .unwrap();
+        }
+        assert!(
+            local.health.health() >= 11.0,
+            "the tick's own regen healed: {}",
+            local.health.health()
+        );
+        assert_eq!(local.health.food.food, 20, "the food level stays frozen through regen");
+        assert_eq!(
+            local.health.food.exhaustion, 0.0,
+            "the regen's cost is dead by the tick that follows"
+        );
     }
 
     #[test]
@@ -148,9 +179,13 @@ mod tests {
         local
             .food_tick(&resources().health, HealthRules::default())
             .unwrap();
+        assert_eq!(
+            local.health.food.food, 20,
+            "frozen back to full before the tick"
+        );
         assert_eq!(local.health.health(), 20.0, "no starvation damage");
         assert!(local.events.is_empty());
-        assert_eq!(local.health.food.timer, 79);
+        assert_eq!(local.health.food.timer, 0);
         drop(_decision);
 
         let mut guest = player(GUEST, 0, 0.0, 79);
