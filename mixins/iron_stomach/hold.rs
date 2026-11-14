@@ -8,10 +8,11 @@
 // itself is floored at 20, so a player who was already starving is picked
 // back up instead of starving forever. Starvation is therefore impossible,
 // the regen cost (`add_exhaustion(6.0)` per heal) is dead by the next tick,
-// and every other player's tick runs on untouched.
+// and — while the window does not host a LAN world with guest protection —
+// every other player's tick runs on untouched.
 // Copyright (c) 2026 hakergeniusz. MIT.
 fn iron_stomach_hold(player: &mut PlayerMotion) -> core::ops::ControlFlow<Result<()>> {
-    if crate::hunger::iron_stomach_gate::holds(player.entity_id as u32) {
+    if crate::hunger::iron_stomach_gate::freezing(player.entity_id as u32) {
         player.health.food.food = player.health.food.food.max(20);
         player.health.food.exhaustion = 0.0;
     }
