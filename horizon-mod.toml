@@ -1,0 +1,17 @@
+# Iron Stomach: hunger never drains. A Hooks-only native mod: no game
+# internals, no [[native.*]] tables - the compiler re-pins it to newer
+# builds as long as the API surface holds.
+id = "iron_stomach"
+name = "Iron Stomach"
+version = "1.3.0"
+description = "Hunger never drains: eating, exhaustion and starving leave the food bar untouched. Protects LAN guests too."
+authors = ["hakergeniusz"]
+license = "MIT"
+api = "0.2"
+side = "both"
+capabilities = ["registries"]
+
+[native]
+game = "26.3"
+horizon = "f037744a79f9982c47876f49c5a3067279f88706"
+mixins = "e59da9094f0c2fdda6c627fe9eff22dec6a906f0"

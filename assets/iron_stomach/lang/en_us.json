@@ -1,0 +1,4 @@
+{
+  "iron_stomach.setting.guests": "Protect guests",
+  "iron_stomach.setting.guests.tooltip": "Also freeze hunger for everyone joining your hosted LAN world."
+}

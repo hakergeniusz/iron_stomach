@@ -1,12 +1,9 @@
 [package]
-name = "horizon-iron_stomach"
-version = "1.1.0"
+name = "iron_stomach"
+version = "1.3.0"
 edition = "2024"
 license = "MIT"
-description = "Holds the local player's hunger: food never drains and starvation never hurts, while LAN guests and mobs keep vanilla hunger. A Horizon native mod."
-publish = false
 
-# The runtime doubles as the mod's library (its tests) and carries the frozen
-# decision's rules; the bundle's helper files compile only inside the game.
-[lib]
-path = "mixins/iron_stomach/runtime.rs"
+[dependencies]
+# The pinned SDK's API crate; the launcher stages its own copy of the same build.
+horizon-mod-api = { path = ".horizon/sdk/api/crates/horizon-mod-api" }
